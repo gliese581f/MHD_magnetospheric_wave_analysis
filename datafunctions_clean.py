@@ -17,66 +17,6 @@ import sys
 import time
 
 
-
-def geo_orbit(radius,dire):
-	
-	xt,yt = [],[]
-	
-
-	Rsat = radius
-	vel  = 1./240 * np.pi/180
-	scale= 8
-	
-	for i in xrange(0,len(os.listdir(dire))*10,10):
-		if Rsat*np.sin(vel*i-np.pi/2)*scale +80 > 0 and Rsat*np.sin(vel*i-np.pi/2)*scale +80 < 160: # and Rsat*np.sin(alpha*i-np.pi/2)*scale/Re < 160:
-			yt.append( int(Rsat*np.cos(vel*i-np.pi/2)*scale ) )
-			xt.append( int(Rsat*np.sin(vel*i-np.pi/2)*scale +80) )
-			
-	return xt,yt		
-	
-
-
-def geo_stat(radius,angles,dire):
-	
-	xt,yt = [],[]
-	
-	Rsat = radius
-	scale= 8
-
-	for i in xrange(0,len(os.listdir(dire))*10,10):
-		yt.append( int(Rsat*np.sin(angles)*scale + 200) )
-		xt.append( int(Rsat*np.cos(angles)*scale) +280)
-			
-	return xt,yt	
-
-def geo_stat2(radius,angles,dire):
-	
-	angles = math.radians(angles)
-	xt,yt = [],[]
-	
-	Rsat = radius
-	scale= 8
-
-	for i in xrange(0,600*10,10):
-		yt.append( int(Rsat*np.sin(angles)*800./128 + 400 ) )
-		xt.append( int(Rsat*np.cos(angles)*800./128 + 600) )
-			
-	return xt,yt	
-      
-def geo_ray(angles,dire):
-	
-	xt,yt = [],[]
-	
-	Rsat = radius
-	scale= 8
-
-	for i in xrange(0,600*10,10):
-		yt.append( int(Rsat*np.sin(angles)*scale +80 ) )
-		xt.append( int(Rsat*np.cos(angles)*scale) )
-			
-	return xt,yt      
-
-
 def lengthfield(Lshell):
     theta0 = 1./( np.arccos(np.sqrt(1.0/Lshell)) )
     
@@ -263,14 +203,6 @@ def smooth(x,beta):
 	return y[5:len(y)-5]
       
       
-
-def va(mod,radius):
-	
-	alf = (10**-9)/(sqrt(1000000.0))*(array(mod[radius]['bz'])/sqrt((4*pi*10**-7)*(1.67*10**-27)*array(mod[radius]['rho'])))/1000
-	
-	return alf
-
-
 def dist_mean(func):
 	
 	def gauss(x, A, mu, sigma):
@@ -422,122 +354,23 @@ def dcorrs2(s,t):
 	
 	return dcor
 
-
-
-
-
-def read_data(files):
+def energy_map(dire,time0,time1):
   
-	import numpy as np
-	#_values = ['rho','ux','uy','uz','bx','by','bz','p','bx1','by1','bz1','jx','jy','jz']
-	values = ['rho','ux','uy','uz','bx','by','bz','p','bx1','by1','by2','bz1','g','jx','jy','jz']
-	container = {}
-	
-	data = np.genfromtxt(files,delimiter=',')
-	for num,val in enumerate(_values):
-		#container[val] = data[num*160:160*(num+1)].T[0:480].T
-		container[val] = data[num*400:400*(num+1)].T[:400].T
-        
-	container['ex'] = (-container['uy']*container['bz'] + container['uz']*container['by'])*10**-3
-	container['ey'] = (container['ux']*container['bz'] - container['uz']*container['bx'])*10**-3
-	container['ez'] = (-container['ux']*container['by'] + container['uy']*container['bx'])*10**-3
-	
-	return container
-
-def read_data_line(files):
-    import numpy as np
-    _values = ['x','y','z','rho','ux','uy','uz','energy','bx','by','bz','p','jx','jy','jz','eta']
-
-    container = {}
-	
-    data = np.genfromtxt(files)
-    for num,val in enumerate(_values):
-		#container[val] = data[num*160:160*(num+1)].T[0:480].T
-        container[val] = data.T[num]
-        
-    container['ex'] = (-container['uy']*container['bz'] + container['uz']*container['by'])*10**-3
-    container['ey'] = (container['ux']*container['bz'] - container['uz']*container['bx'])*10**-3
-    container['ez'] = (-container['ux']*container['by'] + container['uy']*container['bx'])*10**-3
-    return container
-
-def read_data_025(files):
-  
-	import numpy as np
-	_values = ['rho','ux','uy','uz','bx','by','bz','p','jx','jy','jz']
-	
-	container = {}
-	
-	data = np.genfromtxt(files,delimiter=',')
-	for num,val in enumerate(_values):
-		container[val] = data[num*320:320*(num+1)].T[0:320].T
-		#container[val] = data[num*320:320*(num+1)].T[:320].T
-
-	container['ex'] = (-container['uy']*container['bz'] + container['uz']*container['by'])*10**-3
-	container['ey'] = (container['ux']*container['bz'] - container['uz']*container['bx'])*10**-3
-	container['ez'] = (-container['ux']*container['by'] + container['uy']*container['bx'])*10**-3
-
-
-	return container
-
-
-
-def read_data_ful(files):
-  
-	import numpy as np
-	_values = ['rho','ux','uy','uz','bx','by','bz','pe','ppar','p','pperp','b1x','b1y','b1z','jx','jy','jz']
-	
-	container = {}
-	
-	data = np.genfromtxt(files,delimiter=',')
-	for num,val in enumerate(_values):
-		#container[val] = data[num*160:160*(num+1)].T[0:480].T
-		container[val] = data[num*400:400*(num+1)].T[:400].T
-
-	container['ex'] = (-container['uy']*container['bz'] + container['uz']*container['by'])*10**-3
-	container['ey'] = (container['ux']*container['bz'] - container['uz']*container['bx'])*10**-3
-	container['ez'] = (-container['ux']*container['by'] + container['uy']*container['bx'])*10**-3
-
-
-	return container
-
-def clean_datas( data):
-
-	for i in xrange(data.shape[0]):
-		for j in xrange(data.shape[1]):
-			if data.T[j][i] != data.T[j][i]:
-				data.T[j][i] = 0
-				
-	return data     
-def read_data_all(files):
-  
-	_values = ['rho','mx','my','mz','bx','by','bz','pe','ppar','p']
-	
-	container = {}
-	
-	for num,val in enumerate(_values):
-		container[val] = np.genfromtxt(files,delimiter=',')[num*400:400*(num+1)].T[0:400].T
-		
-	return container
-
-
-
-#def energy_map(dire,time0,time1):
-  
-	#import multiprocessing as mp
+	import multiprocessing as mp
  
   
-	#_val = ['e_ez']
+	_val = ['e_ez']
 
-	#sat = {}
-	#con = {}
+	sat = {}
+	con = {}
 	
-	#size_x =  read_data('u0050.dat')['rho'].shape[0]
-	#size_y =  read_data('u0050.dat')['rho'].shape[1]
+	size_x =  read_data('u0050.dat')['rho'].shape[0]
+	size_y =  read_data('u0050.dat')['rho'].shape[1]
 	
 
-	#for v in _val:
-		#con[v]={}
-		#for f in arange(0.0,0.01,0.001):
+	for v in _val:
+		con[v]={}
+		for f in arange(0.0,0.01,0.001):
 			#con[v][f] = np.zeros([size_x,size_y])
 					
 	#for v in _val:
@@ -920,31 +753,6 @@ def radial_psd(quant,data,sample,beta,start,end):
 	return np.array(r)
 
 
-#val_all = mpanisoall[0].keys()
-#val_all.remove('ex'),val_all.remove('ey'),val_all.remove('ez')
-#val_ful = mpanisoful[0].keys()
-#sat = {}
-#for keys in mpresis.keys():
-    #sat[keys] = {}
-    #for val in val_all+val_ful:
-        #sat[keys][val] = []
-
-#for keys in mpresis.keys():
-    #for val in val_all+val_ful:
-        #if val in val_all and val in val_ful:
-            #correction = mpanisoful[keys][val][-1]/mpanisoall[keys][val][0]
-            #sat[keys][val] = mpanisoful[keys][val] + (correction*np.array(mpanisoall[keys][val])).tolist()
-        #elif val == 'mx':
-            #correction = mpanisoful[keys]['ux'][-1]/(sat[keys]['rho'][-1]*mpanisoall[keys]['mx'][0])
-            #sat[keys]['ux'] = mpanisoful[keys]['ux'] + (correction*np.array(mpanisoall[keys]['mx'])).tolist()
-        #elif val == 'my':
-            #correction = mpanisoful[keys]['uy'][-1]/(sat[keys]['rho'][-1]*mpanisoall[keys]['my'][0])
-            #sat[keys]['uy'] = mpanisoful[keys]['uy'] + (correction*np.array(mpanisoall[keys]['my'])).tolist()
-        #elif val == 'mz':
-            #correction = mpanisoful[keys]['uz'][-1]/(sat[keys]['rho'][-1]*mpanisoall[keys]['mz'][0])
-            #sat[keys]['uz'] = mpanisoful[keys]['uz'] + (correction*np.array(mpanisoall[keys]['mz'])).tolist()
-                
-
 def va(mod,radius):
 	
 	alf = (10**-9)/(np.sqrt(1000000.0))*(np.array(mod[radius]['bz'])/np.sqrt((4*np.pi*10**-7)*(1.67*10**-27)*np.array(mod[radius]['rho'])))/1000
@@ -983,22 +791,6 @@ def findzeros(data,rad,quant,start):
                 zero1.append(data[rad][quant][start:][i])
     return zero,zero1
 
-def smoothdata(data):
-    
-    for keys in data.keys():
-        for vals in data[keys].keys():
-            for i in xrange(len(data[keys][vals][1:-1])):
-                if np.abs(data[keys][vals][i])> np.abs(5*data[keys][vals][i+1]) or np.abs(data[keys][vals][i]) < np.abs(5*data[keys][vals][i+1]):
-                    data[keys][vals][i+1] = 0*(data[keys][vals][i-1]+data[keys][vals][i+1])/2
-                #elif np.abs(data[keys][vals][i])> np.abs(1.5*data[keys][vals][i-1]) or np.abs(data[keys][vals][i]) < np.abs(1.5*data[keys][vals][i-1]):
-                    #data[keys][vals][i] = (data[keys][vals][i-1]+data[keys][vals][i+1])/2
-
-    #return data
-
-#freq = 1000*np.array(fpsd(mp1x[20]['rho'],10)[0])
-#freq1 = 1000*np.array(fpsd(mp2x[20]['rho'],10)[0])
-#freq2 = 1000*np.array(fpsd(mpres[20]['rho'],10)[0])
-#freq3 = 1000*np.array(fpsd(mpaniso[20]['rho'],10)[0])
 
 
 def evoldens_2ax(data):
@@ -1098,9 +890,6 @@ def evoldens_3ax(data):
     plt.show()
 
 
-
-
-
 def sfft(data,sample):
     hops = []
     for i in xrange(len(data)-501):
@@ -1125,35 +914,7 @@ def mp_arclength(subsolar,angles):
     arc = quad(integrand,np.radians(angles[0]),np.radians(angles[1]),args=(subsolar))
     
     return np.abs(arc[0])
-
-#new_x = np.zeros(135)
-
-#for i in xrange(len(new_x)):
-    #new_x[i] = new_x[i-1] + mp_arclength(9.25,[i,i+1])
-    #print new_x[i]
-    
-#x,y = np.meshgrid(new_x,np.arange(0,len(mp1x[60]['bx'][200:]),1)
-#plt.pcolor(np.arange(0,len(bob[1]),1),new_x,bob)
-
-
-#for kk in mpani.keys():
-    #for jj in mpani[kk].keys():
-        #mpani[kk][jj] = mpani[kk][jj][:2866]
-
-def para(x,a,b,c,omega,growth):
-    return b+a*np.exp(growth*x)*np.sin(np.degrees(omega)*x+c) #+ b*np.exp(-growth*x)*np.cos(np.degrees(omega*x))
-
-def funs(x,t):
-    return x[0] * np.exp(x[1] * t) * (np.sin(2*3.14159*x[2] * t-x[3])+np.cos(2*3.14159*x[4] * t-x[5])) +x[6] 
-           
-#
-def fun(x, y,t):
-    return y- x[0] * np.exp( x[1]*t  ) * (np.sin(2*3.14159*x[2] * t-x[3])+np.cos(2*3.14159*x[4] * t-x[5])) +x[6]
-
-
-
-
-    
+   
 def evoldens_3ax(data,names):
 
     freq = 1000*np.array(fpsd(data[20]['rho'],10)[0])
@@ -1212,14 +973,3 @@ def evoldens_3ax(data,names):
     axes[1].set_xlabel('X-axis')
     plt.tight_layout()
     plt.subplots_adjust(wspace=0.4)   
-    #plt.show()
-
-#evoldens_3ax(mp1x,'Ideal MHD')
-#plt.savefig('evolvdens_mp1x.jpeg')
-
-#evoldens_3ax(mpaniso,'Anisotropic MHD')
-#plt.savefig('evolvdens_mpaniso.jpeg')
-
-#evoldens_3ax(mpres,'Resistive MHD')
-#plt.savefig('evolvdens_mpres.jpeg')
-plt.rcParams['lines.linewidth'] = 2
