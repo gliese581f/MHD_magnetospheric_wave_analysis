@@ -1,0 +1,1 @@
+# MHD_magnetospheric_wave_analysis
